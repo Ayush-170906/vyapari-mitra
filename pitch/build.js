@@ -250,9 +250,10 @@ pres.defineSlideMaster({ title: "BLANK", background: { color: WHITE }, objects: 
   const s = pres.addSlide();
   s.background = { color: IVORY };
   s.addText("Live Demo — Vyapari Mitra in Action", { x: 0.7, y: 0.5, w: 11.9, h: 0.7, fontSize: 27, bold: true, color: NAVY, fontFace: "Times New Roman", isTextBox: true, margin: 0 });
-  s.addText("Working prototype · web app · Sarvam-105B model", {
-    x: 0.7, y: 1.15, w: 8, h: 0.4, fontSize: 13, color: MUTED, italic: true, fontFace: "Calibri", isTextBox: true, margin: 0
-  });
+  s.addText([
+    { text: "Working prototype · web app · Sarvam-105B model  ·  ", options: { color: MUTED, italic: true } },
+    { text: "github.com/Ayush-170906/vyapari-mitra", options: { color: CYAN_D, bold: true, hyperlink: { url: "https://github.com/Ayush-170906/vyapari-mitra" } } }
+  ], { x: 0.7, y: 1.15, w: 7.7, h: 0.4, fontSize: 12, fontFace: "Calibri", isTextBox: true, margin: 0 });
 
   s.addShape("roundRect", { x: 8.55, y: 1.1, w: 4.1, h: 5.85, rectRadius: 0.28, fill: { color: NAVY }, line: { type: "none" }, shadow: freshShadow() });
   s.addImage({ path: path.join(__dirname, "demo-shot.png"), x: 8.75, y: 1.3, w: 3.7, h: 5.5, sizing: { type: "crop", w: 3.7, h: 5.5 } });
@@ -525,6 +526,10 @@ pres.defineSlideMaster({ title: "BLANK", background: { color: WHITE }, objects: 
   s.addText("Team: The Vision   ·   Ayush Korde  &  Harshita Girase   ·   Powered by Sarvam AI", {
     x: 0.9, y: 6.6, w: 11.5, h: 0.4, fontSize: 13, color: MUTED, fontFace: "Calibri", isTextBox: true, margin: 0
   });
+  s.addText([
+    { text: "Code & working prototype: ", options: { color: MUTED } },
+    { text: "github.com/Ayush-170906/vyapari-mitra", options: { color: CYAN_D, bold: true, hyperlink: { url: "https://github.com/Ayush-170906/vyapari-mitra" } } }
+  ], { x: 0.9, y: 6.95, w: 11.5, h: 0.35, fontSize: 12.5, fontFace: "Calibri", isTextBox: true, margin: 0 });
 }
 
 pres.writeFile({ fileName: path.join(__dirname, "vyapari-mitra-deck.pptx") }).then(() => {
