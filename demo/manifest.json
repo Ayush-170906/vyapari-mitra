@@ -1,0 +1,15 @@
+{
+  "name": "Vyapari Mitra — Paytm AI Copilot",
+  "short_name": "Vyapari Mitra",
+  "description": "Hindi/Hinglish AI business copilot + fraud shield for Paytm merchants, powered by Sarvam AI.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#002e6e",
+  "icons": [
+    { "src": "paytm-logo.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "paytm-logo.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

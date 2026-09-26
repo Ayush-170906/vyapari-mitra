@@ -1,0 +1,13 @@
+# Unrelated old reference clone — not part of this project
+repo_ref/
+
+# Friend's reference deck (not ours to redistribute)
+pitch/friend_ref/
+
+# Node deps
+pitch/node_modules/
+
+# OS/editor cruft
+.DS_Store
+Thumbs.db
+demo/server.log

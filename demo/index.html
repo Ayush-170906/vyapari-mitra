@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paytm Vyapari Mitra — AI Copilot</title>
+<meta name="description" content="Hindi/Hinglish AI business copilot for Paytm merchants, powered by Sarvam AI.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23002e6e'/%3E%3Ctext x='50' y='68' font-size='55' font-family='Arial' font-weight='bold' fill='%2300baf2' text-anchor='middle'%3EPM%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#002e6e">
+<link rel="apple-touch-icon" href="paytm-logo.png">
+<style>
+  :root{
+    --blue:#00baf2; --dark:#002e6e; --bg:#f4f6f9; --card:#ffffff;
+    --text:#1c2733; --muted:#6b7686; --accent:#00b96b; --border:#e3e8ee;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:radial-gradient(circle at 20% -10%, #dff3fc 0%, var(--bg) 45%);color:var(--text);min-height:100vh;}
+  .app{max-width:480px;margin:0 auto;min-height:100vh;background:var(--card);display:flex;flex-direction:column;box-shadow:0 0 24px rgba(0,0,0,.08);}
+  header{background:linear-gradient(135deg,var(--dark),var(--blue));color:#fff;padding:18px 20px;display:flex;align-items:center;gap:12px;}
+  header .logo{width:44px;height:44px;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;padding:6px;}
+  header .logo img{width:100%;height:100%;object-fit:contain;}
+  header h1{font-size:16px;margin:0;}
+  header p{margin:2px 0 0;font-size:11.5px;opacity:.85;}
+  .setup{padding:14px 20px;background:#fff7e6;border-bottom:1px solid #ffe1a8;font-size:12px;display:flex;gap:8px;align-items:center;}
+  .setup input{flex:1;padding:7px 10px;border:1px solid #ddd;border-radius:6px;font-size:12px;}
+  .setup button{background:var(--dark);color:#fff;border:none;padding:7px 12px;border-radius:6px;font-size:12px;cursor:pointer;}
+  .kpis{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:14px 16px;background:#f8fbff;border-bottom:1px solid var(--border);}
+  .kpi{background:#fff;border:1px solid var(--border);border-radius:10px;padding:10px 8px;text-align:center;}
+  .kpi .v{font-size:16px;font-weight:700;color:var(--dark);}
+  .kpi .l{font-size:10px;color:var(--muted);margin-top:2px;}
+  .chat{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;}
+  .msg{max-width:82%;padding:10px 13px;border-radius:14px;font-size:13.5px;line-height:1.45;white-space:pre-wrap;}
+  .msg.bot{background:#eef3ff;color:var(--text);border-bottom-left-radius:4px;align-self:flex-start;}
+  .msg.user{background:var(--blue);color:#fff;border-bottom-right-radius:4px;align-self:flex-end;}
+  .msg.bot b{color:var(--dark);}
+  .typing{align-self:flex-start;font-size:12px;color:var(--muted);padding-left:4px;}
+  .suggestions{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 10px;}
+  .chip{background:#fff;border:1px solid var(--blue);color:var(--dark);font-size:11.5px;padding:6px 10px;border-radius:16px;cursor:pointer;}
+  .chip-alert{border:1px solid #d0393e;color:#a9262b;font-weight:600;}
+  .chip-alert:hover{background:#d0393e;color:#fff;}
+  .chip:hover{background:var(--blue);color:#fff;}
+  .inputbar{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--border);background:#fff;}
+  .inputbar input{flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:20px;font-size:13.5px;}
+  .inputbar button{background:var(--dark);color:#fff;border:none;width:42px;height:42px;border-radius:50%;font-size:16px;cursor:pointer;}
+  .mic-btn{width:42px !important;padding:0;display:flex;align-items:center;justify-content:center;}
+  .mic-btn.listening{background:#d0393e;animation:pulse 1.1s infinite;}
+  .mic-label{display:none;position:absolute;bottom:64px;left:50%;transform:translateX(-50%);background:#1c2733;color:#fff;font-size:10.5px;padding:4px 10px;border-radius:10px;white-space:nowrap;}
+  .mic-btn.listening .mic-label{display:block;}
+  .inputbar{position:relative;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(208,57,62,.5);}70%{box-shadow:0 0 0 8px rgba(208,57,62,0);}100%{box-shadow:0 0 0 0 rgba(208,57,62,0);}}
+  .badge{font-size:10px;background:var(--accent);color:#fff;padding:2px 8px;border-radius:10px;margin-left:auto;}
+
+  /* Tabs */
+  .langbar{display:flex;align-items:center;gap:5px;flex-wrap:wrap;padding:9px 16px;background:#f8fbff;border-bottom:1px solid var(--border);}
+  .langbar-label{font-size:10.5px;color:var(--muted);margin-right:2px;}
+  .lang-btn{background:#fff;border:1px solid var(--border);color:var(--text);font-size:10.5px;padding:4px 9px;border-radius:12px;cursor:pointer;}
+  .lang-btn.active{background:var(--dark);border-color:var(--dark);color:#fff;}
+  .tabs{display:flex;background:#fff;border-bottom:1px solid var(--border);}
+  .tab{flex:1;padding:11px 4px;text-align:center;font-size:12.5px;font-weight:600;color:var(--muted);background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;}
+  .tab.active{color:var(--dark);border-bottom-color:var(--blue);}
+  .view{display:none;flex:1;flex-direction:column;min-height:0;}
+  .view.active{display:flex;}
+
+  /* Install banner */
+  .install-bar{display:none;align-items:center;gap:8px;padding:9px 16px;background:var(--dark);color:#fff;font-size:12px;}
+  .install-bar.show{display:flex;}
+  .install-bar button{margin-left:auto;background:var(--blue);color:var(--dark);border:none;padding:6px 12px;border-radius:16px;font-size:11.5px;font-weight:700;cursor:pointer;}
+
+  /* Dashboard */
+  .dash{flex:1;overflow-y:auto;padding:16px;background:#f8fbff;}
+  .dash-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:14px;}
+  .dash-card h3{margin:0 0 10px;font-size:13px;color:var(--dark);}
+  .bars{display:flex;align-items:flex-end;gap:6px;height:90px;}
+  .bars .bar{flex:1;background:linear-gradient(180deg,var(--blue),var(--dark));border-radius:4px 4px 0 0;position:relative;}
+  .bars .bar span{position:absolute;top:-16px;left:0;right:0;text-align:center;font-size:9px;color:var(--muted);}
+  .bar-labels{display:flex;gap:6px;margin-top:6px;}
+  .bar-labels div{flex:1;text-align:center;font-size:9.5px;color:var(--muted);}
+  .prod-row{display:flex;align-items:center;gap:8px;margin-bottom:9px;font-size:11.5px;}
+  .prod-row .name{width:110px;flex-shrink:0;color:var(--text);}
+  .prod-row .track{flex:1;background:#eef1f5;border-radius:6px;height:10px;overflow:hidden;}
+  .prod-row .fill{height:100%;background:var(--blue);border-radius:6px;}
+  .prod-row .pct{width:32px;text-align:right;color:var(--muted);font-size:10.5px;}
+  .rating-big{display:flex;align-items:center;gap:16px;}
+  .rating-big .num{font-size:34px;font-weight:800;color:var(--dark);}
+  .rating-stars{flex:1;}
+  .star-row{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--muted);margin-bottom:3px;}
+  .star-row .track{flex:1;background:#eef1f5;border-radius:5px;height:7px;overflow:hidden;}
+  .star-row .fill{height:100%;background:#f2a93b;}
+  .log-item{display:flex;gap:9px;padding:8px 0;border-bottom:1px solid #f0f2f5;font-size:11.5px;}
+  .log-item:last-child{border-bottom:none;}
+  .log-dot{width:9px;height:9px;border-radius:50%;margin-top:4px;flex-shrink:0;}
+  .log-dot.ok{background:#1faa6b;}
+  .log-dot.bad{background:#d0393e;}
+  .log-dot.warn{background:#f2a93b;}
+  .log-item .t{color:var(--muted);font-size:10px;display:block;}
+  .actions{display:flex;flex-direction:column;gap:8px;}
+  .action-btn{display:flex;align-items:center;justify-content:space-between;background:#eef6ff;border:1px solid #cfe8fb;border-radius:10px;padding:10px 12px;font-size:12px;font-weight:600;color:var(--dark);cursor:pointer;}
+  .action-btn:hover{background:var(--blue);color:#fff;}
+  .action-btn .go{font-size:10px;opacity:.7;}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#1c2733;color:#fff;padding:10px 18px;border-radius:22px;font-size:12.5px;box-shadow:0 6px 18px rgba(0,0,0,.25);z-index:50;opacity:0;transition:opacity .25s;pointer-events:none;}
+  .toast.show{opacity:1;}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo"><img src="paytm-logo.png" alt="Paytm"/></div>
+    <div>
+      <h1>Vyapari Mitra <span class="badge">Sarvam AI</span></h1>
+      <p>Bolein ya likhein — Hindi Business Copilot</p>
+    </div>
+  </header>
+
+  <div class="install-bar" id="installBar">
+    <span>Vyapari Mitra ko app ki tarah install karein — offline bhi chalega</span>
+    <button onclick="installApp()">Install</button>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="chat" onclick="switchTab('chat')">Chat</button>
+    <button class="tab" data-tab="dashboard" onclick="switchTab('dashboard')">Dashboard</button>
+  </div>
+
+  <!-- ===== CHAT VIEW ===== -->
+  <div class="view active" id="view-chat">
+    <div class="langbar" id="langBar">
+      <span class="langbar-label">Bhasha:</span>
+      <button class="lang-btn active" data-lang="hi" onclick="setLang('hi')">हिंदी</button>
+      <button class="lang-btn" data-lang="mr" onclick="setLang('mr')">मराठी</button>
+      <button class="lang-btn" data-lang="bn" onclick="setLang('bn')">বাংলা</button>
+      <button class="lang-btn" data-lang="gu" onclick="setLang('gu')">ગુજરાતી</button>
+      <button class="lang-btn" data-lang="ta" onclick="setLang('ta')">தமிழ்</button>
+      <button class="lang-btn" data-lang="te" onclick="setLang('te')">తెలుగు</button>
+      <button class="lang-btn" data-lang="kn" onclick="setLang('kn')">ಕನ್ನಡ</button>
+      <button class="lang-btn" data-lang="ml" onclick="setLang('ml')">മലയാളം</button>
+      <button class="lang-btn" data-lang="pa" onclick="setLang('pa')">ਪੰਜਾਬੀ</button>
+      <button class="lang-btn" data-lang="or" onclick="setLang('or')">ଓଡ଼ିଆ</button>
+      <button class="lang-btn" data-lang="en" onclick="setLang('en')">English</button>
+    </div>
+
+    <div class="setup" id="setupBar">
+      <span>API Key</span>
+      <input id="apiKey" type="password" placeholder="Sarvam AI API key daalein (sk_...)"/>
+      <button onclick="saveKey()">Save</button>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi"><div class="v">₹1.82L</div><div class="l">Is hafte sales</div></div>
+      <div class="kpi"><div class="v">▲ 14%</div><div class="l">Pichle hafte se</div></div>
+      <div class="kpi"><div class="v">3.9★</div><div class="l">Customer rating</div></div>
+    </div>
+
+    <div class="chat" id="chat"></div>
+
+    <div class="suggestions" id="suggestions"></div>
+
+    <div class="inputbar">
+      <button id="micBtn" class="mic-btn" onclick="toggleMic()" title="Bolke poochhein">
+        <span class="mic-label" id="micLabel"></span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M19 11a7 7 0 0 1-14 0M12 18v3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <input id="userInput" type="text" placeholder="Bolein ya yahan likhein..." onkeydown="if(event.key==='Enter')sendMsg()"/>
+      <button onclick="sendMsg()">➤</button>
+    </div>
+  </div>
+
+  <!-- ===== DASHBOARD VIEW ===== -->
+  <div class="view" id="view-dashboard">
+    <div class="dash">
+
+      <div class="dash-card">
+        <h3>Sales Trend — Is Hafte (₹1,82,000)</h3>
+        <div class="bars" id="salesBars"></div>
+        <div class="bar-labels"><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div></div>
+      </div>
+
+      <div class="dash-card">
+        <h3>Top Products</h3>
+        <div class="prod-row"><div class="name">Aata-Chawal Combo</div><div class="track"><div class="fill" style="width:38%"></div></div><div class="pct">38%</div></div>
+        <div class="prod-row"><div class="name">Recharge / Bill Pay</div><div class="track"><div class="fill" style="width:34%"></div></div><div class="pct">34%</div></div>
+        <div class="prod-row"><div class="name">Snacks &amp; Namkeen</div><div class="track"><div class="fill" style="width:28%"></div></div><div class="pct">28%</div></div>
+      </div>
+
+      <div class="dash-card">
+        <h3>Customer Rating</h3>
+        <div class="rating-big">
+          <div class="num">3.9</div>
+          <div class="rating-stars">
+            <div class="star-row">5★<div class="track"><div class="fill" style="width:58%"></div></div></div>
+            <div class="star-row">4★<div class="track"><div class="fill" style="width:22%"></div></div></div>
+            <div class="star-row">3★<div class="track"><div class="fill" style="width:12%"></div></div></div>
+            <div class="star-row">2★<div class="track"><div class="fill" style="width:5%"></div></div></div>
+            <div class="star-row">1★<div class="track"><div class="fill" style="width:3%"></div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-card">
+        <h3>Fraud Shield — Recent Activity</h3>
+        <div class="log-item"><div class="log-dot bad"></div><div>Screenshot verify: <b>FAKE flagged</b> — ₹450 claimed, no ledger match<span class="t">Aaj, 3:12 PM</span></div></div>
+        <div class="log-item"><div class="log-dot ok"></div><div>Screenshot verify: <b>Genuine</b> — ₹220 confirmed on settlement<span class="t">Kal, 6:40 PM</span></div></div>
+        <div class="log-item"><div class="log-dot warn"></div><div>QR silence alert raised, cleared after recheck<span class="t">2 din pehle</span></div></div>
+      </div>
+
+      <div class="dash-card">
+        <h3>Quick Actions <span style="font-weight:400;color:var(--muted);font-size:10.5px;">(n8n workflows)</span></h3>
+        <div class="actions">
+          <div class="action-btn" onclick="runAction('Weekend Extra Cashback campaign launch ho gaya')">Launch Weekend Cashback Offer <span class="go">Run →</span></div>
+          <div class="action-btn" onclick="runAction('Loyalty offer purane customers ko bhej diya gaya')">Send Loyalty Offer to Repeat Customers <span class="go">Run →</span></div>
+          <div class="action-btn" onclick="runAction('Fraud Shield QR standee order request bhej diya')">Order Fraud-Shield QR Standee <span class="go">Run →</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+// ==================================================================
+// Multilingual data: 11 languages Sarvam AI supports (10 Indian + English)
+// ==================================================================
+const LANGS = {
+  hi: { native:'हिंदी', code:'hi-IN',
+    subtitle:'बोलिए या लिखिए — हिंदी बिज़नेस कोपायलट', placeholder:'बोलें या यहाँ लिखें...',
+    greet:'नमस्ते शर्मा जी! मैं हूँ आपका <b>व्यापारी मित्र</b> — आपके Paytm बिज़नेस का AI साथी। नीचे दिए सवाल आज़माएँ या अपना सवाल टाइप करें।',
+    thinking:'व्यापारी मित्र सोच रहा है...', voiceErr:'आवाज़ समझ नहीं आई, दोबारा कोशिश करें या टाइप करें।',
+    listening:'सुन रहा...', apiKeyPh:'Sarvam AI API key डालें (sk_...)' },
+  mr: { native:'मराठी', code:'mr-IN',
+    subtitle:'बोला किंवा लिहा — मराठी बिझनेस कोपायलट', placeholder:'बोला किंवा इथे लिहा...',
+    greet:'नमस्कार शर्मा जी! मी आहे तुमचा <b>व्यापारी मित्र</b> — तुमच्या Paytm व्यवसायाचा AI साथी. खालील प्रश्न वापरून पहा किंवा तुमचा प्रश्न टाइप करा.',
+    thinking:'व्यापारी मित्र विचार करत आहे...', voiceErr:'आवाज समजला नाही, पुन्हा प्रयत्न करा किंवा टाइप करा.',
+    listening:'ऐकत आहे...', apiKeyPh:'Sarvam AI API की टाका (sk_...)' },
+  bn: { native:'বাংলা', code:'bn-IN',
+    subtitle:'বলুন বা লিখুন — বাংলা বিজনেস কোপাইলট', placeholder:'বলুন বা এখানে লিখুন...',
+    greet:'নমস্কার শর্মা জি! আমি আপনার <b>ব্যাপারী মিত্র</b> — আপনার Paytm ব্যবসার AI সঙ্গী। নিচের প্রশ্নগুলো try করুন অথবা নিজের প্রশ্ন টাইপ করুন।',
+    thinking:'ব্যাপারী মিত্র ভাবছে...', voiceErr:'কণ্ঠস্বর বোঝা যায়নি, আবার চেষ্টা করুন বা টাইপ করুন।',
+    listening:'শুনছি...', apiKeyPh:'Sarvam AI API কী দিন (sk_...)' },
+  gu: { native:'ગુજરાતી', code:'gu-IN',
+    subtitle:'બોલો અથવા લખો — ગુજરાતી બિઝનેસ કોપાયલટ', placeholder:'બોલો અથવા અહીં લખો...',
+    greet:'નમસ્તે શર્મા જી! હું છું તમારો <b>વ્યાપારી મિત્ર</b> — તમારા Paytm બિઝનેસનો AI સાથી. નીચે આપેલા સવાલો ટ્રાય કરો અથવા તમારો સવાલ ટાઈપ કરો.',
+    thinking:'વ્યાપારી મિત્ર વિચારી રહ્યો છે...', voiceErr:'અવાજ સમજાયો નહીં, ફરી પ્રયત્ન કરો અથવા ટાઈપ કરો.',
+    listening:'સાંભળી રહ્યો છે...', apiKeyPh:'Sarvam AI API કી નાખો (sk_...)' },
+  ta: { native:'தமிழ்', code:'ta-IN',
+    subtitle:'பேசுங்கள் அல்லது தட்டச்சு செய்யுங்கள் — தமிழ் பிசினஸ் கோபைலட்', placeholder:'பேசுங்கள் அல்லது இங்கே தட்டச்சு செய்யுங்கள்...',
+    greet:'வணக்கம் சர்மா ஜி! நான் உங்கள் <b>வியாபாரி மித்ரா</b> — உங்கள் Paytm வணிகத்தின் AI துணை. கீழே உள்ள கேள்விகளை முயற்சிக்கவும் அல்லது உங்கள் கேள்வியை தட்டச்சு செய்யவும்.',
+    thinking:'வியாபாரி மித்ரா யோசிக்கிறார்...', voiceErr:'குரல் புரியவில்லை, மீண்டும் முயற்சிக்கவும் அல்லது தட்டச்சு செய்யவும்.',
+    listening:'கேட்கிறேன்...', apiKeyPh:'Sarvam AI API கீ-யை உள்ளிடவும் (sk_...)' },
+  te: { native:'తెలుగు', code:'te-IN',
+    subtitle:'మాట్లాడండి లేదా టైప్ చేయండి — తెలుగు బిజినెస్ కోపైలట్', placeholder:'మాట్లాడండి లేదా ఇక్కడ టైప్ చేయండి...',
+    greet:'నమస్తే శర్మ గారు! నేను మీ <b>వ్యాపారి మిత్ర</b> — మీ Paytm వ్యాపారానికి AI సహచరుడు. కింద ఉన్న ప్రశ్నలు ప్రయత్నించండి లేదా మీ ప్రశ్న టైప్ చేయండి.',
+    thinking:'వ్యాపారి మిత్ర ఆలోచిస్తున్నారు...', voiceErr:'వాయిస్ అర్థం కాలేదు, మళ్ళీ ప్రయత్నించండి లేదా టైప్ చేయండి.',
+    listening:'వింటున్నాను...', apiKeyPh:'Sarvam AI API కీని నమోదు చేయండి (sk_...)' },
+  kn: { native:'ಕನ್ನಡ', code:'kn-IN',
+    subtitle:'ಮಾತನಾಡಿ ಅಥವಾ ಟೈಪ್ ಮಾಡಿ — ಕನ್ನಡ ಬಿಸಿನೆಸ್ ಕೋಪೈಲಟ್', placeholder:'ಮಾತನಾಡಿ ಅಥವಾ ಇಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ...',
+    greet:'ನಮಸ್ಕಾರ ಶರ್ಮಾ ಜೀ! ನಾನು ನಿಮ್ಮ <b>ವ್ಯಾಪಾರಿ ಮಿತ್ರ</b> — ನಿಮ್ಮ Paytm ವ್ಯವಹಾರದ AI ಸಂಗಾತಿ. ಕೆಳಗಿನ ಪ್ರಶ್ನೆಗಳನ್ನು ಪ್ರಯತ್ನಿಸಿ ಅಥವಾ ನಿಮ್ಮ ಪ್ರಶ್ನೆ ಟೈಪ್ ಮಾಡಿ.',
+    thinking:'ವ್ಯಾಪಾರಿ ಮಿತ್ರ ಯೋಚಿಸುತ್ತಿದ್ದಾರೆ...', voiceErr:'ಧ್ವನಿ ಅರ್ಥವಾಗಲಿಲ್ಲ, ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ ಅಥವಾ ಟೈಪ್ ಮಾಡಿ.',
+    listening:'ಕೇಳುತ್ತಿದ್ದೇನೆ...', apiKeyPh:'Sarvam AI API ಕೀ ನಮೂದಿಸಿ (sk_...)' },
+  ml: { native:'മലയാളം', code:'ml-IN',
+    subtitle:'സംസാരിക്കൂ അല്ലെങ്കിൽ ടൈപ്പ് ചെയ്യൂ — മലയാളം ബിസിനസ് കോപൈലറ്റ്', placeholder:'സംസാരിക്കൂ അല്ലെങ്കിൽ ഇവിടെ ടൈപ്പ് ചെയ്യൂ...',
+    greet:'നമസ്കാരം ശർമ്മ ജി! ഞാൻ നിങ്ങളുടെ <b>വ്യാപാരി മിത്ര</b> — നിങ്ങളുടെ Paytm ബിസിനസിന്റെ AI സഹായി. താഴെയുള്ള ചോദ്യങ്ങൾ ശ്രമിക്കൂ അല്ലെങ്കിൽ നിങ്ങളുടെ ചോദ്യം ടൈപ്പ് ചെയ്യൂ.',
+    thinking:'വ്യാപാരി മിത്ര ചിന്തിക്കുന്നു...', voiceErr:'ശബ്ദം മനസ്സിലായില്ല, വീണ്ടും ശ്രമിക്കൂ അല്ലെങ്കിൽ ടൈപ്പ് ചെയ്യൂ.',
+    listening:'കേൾക്കുന്നു...', apiKeyPh:'Sarvam AI API കീ നൽകൂ (sk_...)' },
+  pa: { native:'ਪੰਜਾਬੀ', code:'pa-IN',
+    subtitle:'ਬੋਲੋ ਜਾਂ ਲਿਖੋ — ਪੰਜਾਬੀ ਬਿਜ਼ਨਸ ਕੋਪਾਇਲਟ', placeholder:'ਬੋਲੋ ਜਾਂ ਇੱਥੇ ਲਿਖੋ...',
+    greet:'ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ ਸ਼ਰਮਾ ਜੀ! ਮੈਂ ਹਾਂ ਤੁਹਾਡਾ <b>ਵਪਾਰੀ ਮਿੱਤਰ</b> — ਤੁਹਾਡੇ Paytm ਬਿਜ਼ਨਸ ਦਾ AI ਸਾਥੀ। ਹੇਠਾਂ ਦਿੱਤੇ ਸਵਾਲ ਅਜ਼ਮਾਓ ਜਾਂ ਆਪਣਾ ਸਵਾਲ ਟਾਈਪ ਕਰੋ।',
+    thinking:'ਵਪਾਰੀ ਮਿੱਤਰ ਸੋਚ ਰਿਹਾ ਹੈ...', voiceErr:'ਆਵਾਜ਼ ਸਮਝ ਨਹੀਂ ਆਈ, ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ ਜਾਂ ਟਾਈਪ ਕਰੋ।',
+    listening:'ਸੁਣ ਰਿਹਾ...', apiKeyPh:'Sarvam AI API ਕੁੰਜੀ ਪਾਓ (sk_...)' },
+  or: { native:'ଓଡ଼ିଆ', code:'or-IN',
+    subtitle:'ବୋଲନ୍ତୁ କିମ୍ବା ଲେଖନ୍ତୁ — ଓଡ଼ିଆ ବିଜନେସ୍ କୋପାଇଲଟ୍', placeholder:'ବୋଲନ୍ତୁ କିମ୍ବା ଏଠାରେ ଲେଖନ୍ତୁ...',
+    greet:'ନମସ୍କାର ଶର୍ମା ଜୀ! ମୁଁ ଆପଣଙ୍କର <b>ବ୍ୟାପାରୀ ମିତ୍ର</b> — ଆପଣଙ୍କ Paytm ବ୍ୟବସାୟର AI ସାଥୀ। ତଳେ ଥିବା ପ୍ରଶ୍ନ ଚେଷ୍ଟା କରନ୍ତୁ କିମ୍ବା ଆପଣଙ୍କ ପ୍ରଶ୍ନ ଟାଇପ୍ କରନ୍ତୁ।',
+    thinking:'ବ୍ୟାପାରୀ ମିତ୍ର ଚିନ୍ତା କରୁଛନ୍ତି...', voiceErr:'ସ୍ୱର ବୁଝିହେଲା ନାହିଁ, ପୁଣି ଚେଷ୍ଟା କରନ୍ତୁ କିମ୍ବା ଟାଇପ୍ କରନ୍ତୁ।',
+    listening:'ଶୁଣୁଛି...', apiKeyPh:'Sarvam AI API କି ଦିଅନ୍ତୁ (sk_...)' },
+  en: { native:'English', code:'en-IN',
+    subtitle:'Speak or type — English Business Copilot', placeholder:'Speak or type here...',
+    greet:"Hello Sharma ji! I'm your <b>Vyapari Mitra</b> — the AI partner for your Paytm business. Try the questions below or type your own.",
+    thinking:'Vyapari Mitra is thinking...', voiceErr:"Couldn't understand the audio, please try again or type.",
+    listening:'Listening...', apiKeyPh:'Enter your Sarvam AI API key (sk_...)' }
+};
+let currentLang = 'hi';
+
+// Short chip labels per language (also used as the displayed "user question")
+const CHIP_LABELS = {
+  hi: ["इस हफ्ते की सेल्स?","बेस्ट सेलर?","ग्रोथ टिप दो","रेटिंग कैसे बढ़ाऊं?","स्क्रीनशॉट वेरिफाई करो (Fraud Shield)"],
+  mr: ["या आठवड्याची विक्री?","बेस्ट सेलर?","ग्रोथ टिप द्या","रेटिंग कशी वाढवू?","स्क्रीनशॉट व्हेरिफाय करा (Fraud Shield)"],
+  bn: ["এই সপ্তাহের বিক্রি?","বেস্ট সেলার?","গ্রোথ টিপ দিন","রেটিং কীভাবে বাড়াবো?","স্ক্রিনশট ভেরিফাই করুন (Fraud Shield)"],
+  gu: ["આ અઠવાડિયાનું વેચાણ?","બેસ્ટ સેલર?","ગ્રોથ ટિપ આપો","રેટિંગ કેવી રીતે વધારું?","સ્ક્રીનશોટ વેરિફાય કરો (Fraud Shield)"],
+  ta: ["இந்த வார விற்பனை?","சிறந்த விற்பனை பொருள்?","வளர்ச்சி டிப் தாருங்கள்","மதிப்பீட்டை எப்படி உயர்த்துவது?","ஸ்கிரீன்ஷாட் சரிபார்க்கவும் (Fraud Shield)"],
+  te: ["ఈ వారం అమ్మకాలు?","బెస్ట్ సెల్లర్?","గ్రోత్ టిప్ ఇవ్వండి","రేటింగ్ ఎలా పెంచాలి?","స్క్రీన్‌షాట్ వెరిఫై చేయండి (Fraud Shield)"],
+  kn: ["ಈ ವಾರದ ಮಾರಾಟ?","ಬೆಸ್ಟ್ ಸೆಲ್ಲರ್?","ಗ್ರೋತ್ ಟಿಪ್ ಕೊಡಿ","ರೇಟಿಂಗ್ ಹೇಗೆ ಹೆಚ್ಚಿಸುವುದು?","ಸ್ಕ್ರೀನ್‌ಶಾಟ್ ಪರಿಶೀಲಿಸಿ (Fraud Shield)"],
+  ml: ["ഈ ആഴ്ചത്തെ വിൽപ്പന?","ബെസ്റ്റ് സെല്ലർ?","ഗ്രോത്ത് ടിപ്പ് തരൂ","റേറ്റിംഗ് എങ്ങനെ കൂട്ടാം?","സ്ക്രീൻഷോട്ട് വെരിഫൈ ചെയ്യൂ (Fraud Shield)"],
+  pa: ["ਇਸ ਹਫ਼ਤੇ ਦੀ ਸੇਲ?","ਬੈਸਟ ਸੈਲਰ?","ਗ੍ਰੋਥ ਟਿਪ ਦਿਓ","ਰੇਟਿੰਗ ਕਿਵੇਂ ਵਧਾਵਾਂ?","ਸਕ੍ਰੀਨਸ਼ਾਟ ਵੈਰੀਫਾਈ ਕਰੋ (Fraud Shield)"],
+  or: ["ଏହି ସପ୍ତାହର ବିକ୍ରୟ?","ବେଷ୍ଟ ସେଲର?","ଗ୍ରୋଥ ଟିପ୍ ଦିଅନ୍ତୁ","ରେଟିଂ କେମିତି ବଢ଼ାଇବି?","ସ୍କ୍ରିନସଟ୍ ଯାଞ୍ଚ କରନ୍ତୁ (Fraud Shield)"],
+  en: ["This week's sales?","Best seller?","Give a growth tip","How to improve rating?","Verify screenshot (Fraud Shield)"]
+};
+const CHIP_KEYS = ['sales','product','growth','rating','fraud']; // maps 1:1 to CHIP_LABELS order
+
+// Full mock replies — one per intent, per language (offline-safe fallback)
+const REPLIES = {
+  sales: {
+    hi: "Is hafte aapki sales <b>₹1,82,000</b> rahi — pichle hafte se <b>14% zyada</b>.\n\n• Sabse zyada growth Recharge/Bill payments mein aayi\n• Weekend (Sat-Sun) pe 40% zyada bikri hoti hai\n\nSuggestion: Weekend pe ek 'Extra Cashback' banner Paytm QR ke paas laga dein — aur zyada customers attract karega.",
+    mr: "या आठवड्यात तुमची विक्री <b>₹1,82,000</b> झाली — मागच्या आठवड्यापेक्षा <b>14% जास्त</b>.\n\n• सर्वात जास्त वाढ रिचार्ज/बिल पेमेंटमध्ये झाली\n• शनिवार-रविवारी 40% जास्त विक्री होते\n\nसूचना: वीकेंडला Paytm QR जवळ 'Extra Cashback' बॅनर लावा — जास्त ग्राहक आकर्षित होतील.",
+    bn: "এই সপ্তাহে আপনার বিক্রি হয়েছে <b>₹1,82,000</b> — গত সপ্তাহের চেয়ে <b>14% বেশি</b>।\n\n• সবচেয়ে বেশি বৃদ্ধি হয়েছে রিচার্জ/বিল পেমেন্টে\n• সপ্তাহান্তে (শনি-রবি) 40% বেশি বিক্রি হয়\n\nপরামর্শ: সপ্তাহান্তে Paytm QR-এর কাছে একটি 'Extra Cashback' ব্যানার লাগান — আরও গ্রাহক আকৃষ্ট হবে।",
+    gu: "આ અઠવાડિયે તમારું વેચાણ <b>₹1,82,000</b> રહ્યું — ગયા અઠવાડિયા કરતાં <b>14% વધુ</b>.\n\n• સૌથી વધુ ગ્રોથ રિચાર્જ/બિલ પેમેન્ટમાં આવ્યો\n• વીકએન્ડ (શનિ-રવિ) પર 40% વધુ વેચાણ થાય છે\n\nસૂચન: વીકએન્ડ પર Paytm QR પાસે 'Extra Cashback' બેનર લગાવો — વધુ ગ્રાહકો આકર્ષાશે.",
+    ta: "இந்த வாரம் உங்கள் விற்பனை <b>₹1,82,000</b> — கடந்த வாரத்தை விட <b>14% அதிகம்</b>.\n\n• அதிக வளர்ச்சி Recharge/Bill பேமெண்ட்களில் வந்தது\n• வார இறுதியில் (சனி-ஞாயிறு) 40% அதிக விற்பனை\n\nபரிந்துரை: வார இறுதியில் Paytm QR அருகில் 'Extra Cashback' பேனர் வையுங்கள் — அதிக வாடிக்கையாளர்களை ஈர்க்கும்.",
+    te: "ఈ వారం మీ అమ్మకాలు <b>₹1,82,000</b> — గత వారం కంటే <b>14% ఎక్కువ</b>.\n\n• అత్యధిక వృద్ధి Recharge/Bill పేమెంట్లలో వచ్చింది\n• వారాంతం (శని-ఆది) 40% ఎక్కువ అమ్మకాలు జరుగుతాయి\n\nసూచన: వారాంతంలో Paytm QR దగ్గర 'Extra Cashback' బ్యానర్ పెట్టండి — ఎక్కువ మంది కస్టమర్లు ఆకర్షితులవుతారు.",
+    kn: "ಈ ವಾರ ನಿಮ್ಮ ಮಾರಾಟ <b>₹1,82,000</b> ಆಗಿತ್ತು — ಕಳೆದ ವಾರಕ್ಕಿಂತ <b>14% ಹೆಚ್ಚು</b>.\n\n• ಅತಿ ಹೆಚ್ಚು ಬೆಳವಣಿಗೆ Recharge/Bill ಪಾವತಿಗಳಲ್ಲಿ ಆಗಿದೆ\n• ವಾರಾಂತ್ಯದಲ್ಲಿ (ಶನಿ-ಭಾನುವಾರ) 40% ಹೆಚ್ಚು ಮಾರಾಟ ಆಗುತ್ತದೆ\n\nಸಲಹೆ: ವಾರಾಂತ್ಯದಲ್ಲಿ Paytm QR ಬಳಿ 'Extra Cashback' ಬ್ಯಾನರ್ ಹಾಕಿ — ಹೆಚ್ಚು ಗ್ರಾಹಕರು ಆಕರ್ಷಿತರಾಗುತ್ತಾರೆ.",
+    ml: "ഈ ആഴ്ച നിങ്ങളുടെ വിൽപ്പന <b>₹1,82,000</b> ആയിരുന്നു — കഴിഞ്ഞ ആഴ്ചയെക്കാൾ <b>14% കൂടുതൽ</b>.\n\n• ഏറ്റവും കൂടുതൽ വളർച്ച Recharge/Bill പേയ്‌മെന്റുകളിൽ വന്നു\n• വാരാന്ത്യത്തിൽ (ശനി-ഞായർ) 40% കൂടുതൽ വിൽപ്പന\n\nനിർദ്ദേശം: വാരാന്ത്യത്തിൽ Paytm QR-നടുത്ത് 'Extra Cashback' ബാനർ വയ്ക്കൂ — കൂടുതൽ ഉപഭോക്താക്കളെ ആകർഷിക്കും.",
+    pa: "ਇਸ ਹਫ਼ਤੇ ਤੁਹਾਡੀ ਸੇਲ <b>₹1,82,000</b> ਰਹੀ — ਪਿਛਲੇ ਹਫ਼ਤੇ ਨਾਲੋਂ <b>14% ਵੱਧ</b>।\n\n• ਸਭ ਤੋਂ ਵੱਧ ਗ੍ਰੋਥ Recharge/Bill ਪੇਮੈਂਟਾਂ ਵਿੱਚ ਆਈ\n• ਵੀਕੈਂਡ (ਸ਼ਨੀ-ਐਤ) 'ਤੇ 40% ਵੱਧ ਸੇਲ ਹੁੰਦੀ ਹੈ\n\nਸੁਝਾਅ: ਵੀਕੈਂਡ 'ਤੇ Paytm QR ਕੋਲ 'Extra Cashback' ਬੈਨਰ ਲਗਾਓ — ਹੋਰ ਗਾਹਕ ਆਕਰਸ਼ਿਤ ਹੋਣਗੇ।",
+    or: "ଏହି ସପ୍ତାହରେ ଆପଣଙ୍କ ବିକ୍ରୟ <b>₹1,82,000</b> ହୋଇଛି — ଗତ ସପ୍ତାହ ଠାରୁ <b>14% ଅଧିକ</b>।\n\n• ସର୍ବାଧିକ ଗ୍ରୋଥ Recharge/Bill ପେମେଣ୍ଟରେ ଆସିଛି\n• ଶନି-ରବି 40% ଅଧିକ ବିକ୍ରୟ ହୁଏ\n\nପରାମର୍ଶ: ୱିକଏଣ୍ଡରେ Paytm QR ପାଖରେ 'Extra Cashback' ବ୍ୟାନର୍ ଲଗାନ୍ତୁ — ଅଧିକ ଗ୍ରାହକ ଆକର୍ଷିତ ହେବେ।",
+    en: "This week your sales were <b>₹1,82,000</b> — <b>14% higher</b> than last week.\n\n• Biggest growth came from Recharge/Bill payments\n• Weekends (Sat-Sun) see 40% more sales\n\nSuggestion: Put up an 'Extra Cashback' banner near your Paytm QR on weekends — it will attract more customers."
+  },
+  product: {
+    hi: "Sabse zyada bikne wala: <b>Aata-Chawal Combo</b>.\n\n• Isse aapke 32% customers wapas aate hain\n• Iske saath log recharge bhi karwa lete hain\n\nSuggestion: Iska ek <b>bundle offer</b> banayein — 'Aata-Chawal + Free Recharge Cashback ₹10' — repeat customers aur badhenge.",
+    mr: "सर्वात जास्त विकला जाणारा: <b>आटा-चावल कॉम्बो</b>.\n\n• तुमचे 32% ग्राहक पुन्हा येतात याच्यासाठी\n• याच्यासोबत ते रिचार्जही करतात\n\nसूचना: एक <b>बंडल ऑफर</b> तयार करा — 'आटा-चावल + मोफत रिचार्ज कॅशबॅक ₹10' — repeat ग्राहक वाढतील.",
+    bn: "সবচেয়ে বেশি বিক্রি হওয়া: <b>আটা-চাল কম্বো</b>।\n\n• আপনার 32% গ্রাহক এটার জন্য আবার আসেন\n• এর সাথে তারা রিচার্জও করান\n\nপরামর্শ: একটি <b>bundle অফার</b> তৈরি করুন — 'আটা-চাল + ফ্রি রিচার্জ ক্যাশব্যাক ₹10' — repeat গ্রাহক বাড়বে।",
+    gu: "સૌથી વધુ વેચાતું: <b>આટા-ચોખા કોમ્બો</b>.\n\n• તમારા 32% ગ્રાહકો આ માટે પાછા આવે છે\n• આની સાથે તેઓ રિચાર્જ પણ કરાવે છે\n\nસૂચન: એક <b>bundle ઑફર</b> બનાવો — 'આટા-ચોખા + ફ્રી રિચાર્જ કેશબેક ₹10' — repeat ગ્રાહકો વધશે.",
+    ta: "அதிகம் விற்பனையாவது: <b>ஆட்டா-அரிசி காம்போ</b>.\n\n• உங்கள் 32% வாடிக்கையாளர்கள் இதற்காக மீண்டும் வருகிறார்கள்\n• இதனுடன் ரீசார்ஜ் செய்யவும் செய்கிறார்கள்\n\nபரிந்துரை: ஒரு <b>bundle ஆபர்</b> உருவாக்குங்கள் — 'ஆட்டா-அரிசி + இலவச ரீசார்ஜ் கேஷ்பேக் ₹10' — repeat வாடிக்கையாளர்கள் அதிகரிக்கும்.",
+    te: "అత్యధికంగా అమ్ముడయ్యేది: <b>ఆటా-రైస్ కాంబో</b>.\n\n• మీ 32% కస్టమర్లు దీని కోసం మళ్ళీ వస్తారు\n• దీనితో పాటు రీచార్జ్ కూడా చేయిస్తారు\n\nసూచన: ఒక <b>bundle ఆఫర్</b> చేయండి — 'ఆటా-రైస్ + ఫ్రీ రీచార్జ్ క్యాష్‌బ్యాక్ ₹10' — repeat కస్టమర్లు పెరుగుతారు.",
+    kn: "ಅತಿ ಹೆಚ್ಚು ಮಾರಾಟವಾಗುವುದು: <b>ಆಟಾ-ಅಕ್ಕಿ ಕಾಂಬೋ</b>.\n\n• ನಿಮ್ಮ 32% ಗ್ರಾಹಕರು ಇದಕ್ಕಾಗಿ ಮತ್ತೆ ಬರುತ್ತಾರೆ\n• ಇದರ ಜೊತೆ ರೀಚಾರ್ಜ್ ಕೂಡ ಮಾಡಿಸುತ್ತಾರೆ\n\nಸಲಹೆ: ಒಂದು <b>bundle ಆಫರ್</b> ಮಾಡಿ — 'ಆಟಾ-ಅಕ್ಕಿ + ಉಚಿತ ರೀಚಾರ್ಜ್ ಕ್ಯಾಶ್‌ಬ್ಯಾಕ್ ₹10' — repeat ಗ್ರಾಹಕರು ಹೆಚ್ಚಾಗುತ್ತಾರೆ.",
+    ml: "ഏറ്റവും കൂടുതൽ വിൽക്കുന്നത്: <b>ആട്ട-അരി കോംബോ</b>.\n\n• നിങ്ങളുടെ 32% ഉപഭോക്താക്കൾ ഇതിനായി തിരികെ വരുന്നു\n• ഇതോടൊപ്പം റീചാർജും ചെയ്യിക്കുന്നു\n\nനിർദ്ദേശം: ഒരു <b>bundle ഓഫർ</b> ഉണ്ടാക്കൂ — 'ആട്ട-അരി + സൗജന്യ റീചാർജ് ക്യാഷ്ബാക്ക് ₹10' — repeat ഉപഭോക്താക്കൾ കൂടും.",
+    pa: "ਸਭ ਤੋਂ ਵੱਧ ਵਿਕਣ ਵਾਲਾ: <b>ਆਟਾ-ਚੌਲ ਕੰਬੋ</b>।\n\n• ਤੁਹਾਡੇ 32% ਗਾਹਕ ਇਸ ਲਈ ਵਾਪਸ ਆਉਂਦੇ ਹਨ\n• ਇਸ ਦੇ ਨਾਲ ਉਹ ਰੀਚਾਰਜ ਵੀ ਕਰਵਾਉਂਦੇ ਹਨ\n\nਸੁਝਾਅ: ਇੱਕ <b>bundle ਆਫ਼ਰ</b> ਬਣਾਓ — 'ਆਟਾ-ਚੌਲ + ਮੁਫ਼ਤ ਰੀਚਾਰਜ ਕੈਸ਼ਬੈਕ ₹10' — repeat ਗਾਹਕ ਵਧਣਗੇ।",
+    or: "ସର୍ବାଧିକ ବିକ୍ରି ହେଉଥିବା: <b>ଆଟା-ଚାଉଳ କମ୍ବୋ</b>।\n\n• ଆପଣଙ୍କ 32% ଗ୍ରାହକ ଏଥିପାଇଁ ପୁଣି ଆସନ୍ତି\n• ଏହା ସହିତ ସେମାନେ ରିଚାର୍ଜ ମଧ୍ୟ କରନ୍ତି\n\nପରାମର୍ଶ: ଏକ <b>bundle ଅଫର୍</b> ତିଆରି କରନ୍ତୁ — 'ଆଟା-ଚାଉଳ + ମାଗଣା ରିଚାର୍ଜ କ୍ୟାସବ୍ୟାକ୍ ₹10' — repeat ଗ୍ରାହକ ବଢ଼ିବେ।",
+    en: "Best seller: <b>Aata-Chawal Combo</b>.\n\n• 32% of your customers come back for it\n• They often add a recharge along with it\n\nSuggestion: Create a <b>bundle offer</b> — 'Aata-Chawal + Free Recharge Cashback ₹10' — this will increase repeat customers."
+  },
+  growth: {
+    hi: "Ek achha growth step:\n\n• Aapke 68% transactions Paytm QR se ho rahe hain — bahut accha hai\n• Paas mein naya competitor discount de raha hai\n\nSuggestion: Paytm Business App se ek <b>'Loyalty Cashback'</b> offer chalayein purane customers ke liye — unhe discount ke bajaye trust se roka ja sakta hai.",
+    mr: "एक चांगली ग्रोथ स्टेप:\n\n• तुमचे 68% व्यवहार Paytm QR वरून होतात — खूप छान\n• जवळच एक नवीन स्पर्धक सूट देत आहे\n\nसूचना: Paytm Business App वरून जुन्या ग्राहकांसाठी <b>'Loyalty Cashback'</b> ऑफर सुरू करा — सवलतीपेक्षा विश्वासाने ग्राहक टिकतात.",
+    bn: "একটি ভালো গ্রোথ পদক্ষেপ:\n\n• আপনার 68% লেনদেন Paytm QR দিয়ে হচ্ছে — খুব ভালো\n• কাছেই একটি নতুন প্রতিদ্বন্দ্বী ডিসকাউন্ট দিচ্ছে\n\nপরামর্শ: Paytm Business App থেকে পুরনো গ্রাহকদের জন্য একটি <b>'Loyalty Cashback'</b> অফার চালান — ডিসকাউন্টের বদলে বিশ্বাস দিয়ে তাদের ধরে রাখা যায়।",
+    gu: "એક સારું ગ્રોથ સ્ટેપ:\n\n• તમારા 68% ટ્રાન્ઝેક્શન Paytm QR થી થાય છે — ખૂબ સરસ\n• નજીકમાં એક નવો સ્પર્ધક ડિસ્કાઉન્ટ આપી રહ્યો છે\n\nસૂચન: Paytm Business App પરથી જૂના ગ્રાહકો માટે <b>'Loyalty Cashback'</b> ઑફર ચલાવો — ડિસ્કાઉન્ટ કરતાં વિશ્વાસથી તેમને રોકી શકાય.",
+    ta: "ஒரு நல்ல வளர்ச்சி படி:\n\n• உங்கள் 68% பரிவர்த்தனைகள் Paytm QR வழியாக நடக்கின்றன — மிகவும் நல்லது\n• அருகில் ஒரு புதிய போட்டியாளர் தள்ளுபடி தருகிறார்\n\nபரிந்துரை: Paytm Business App மூலம் பழைய வாடிக்கையாளர்களுக்கு <b>'Loyalty Cashback'</b> ஆபர் இயக்குங்கள் — தள்ளுபடியை விட நம்பிக்கை மூலம் அவர்களை தக்கவைக்கலாம்.",
+    te: "మంచి గ్రోత్ స్టెప్:\n\n• మీ 68% లావాదేవీలు Paytm QR ద్వారా జరుగుతున్నాయి — చాలా బాగుంది\n• దగ్గరలో ఒక కొత్త పోటీదారుడు డిస్కౌంట్ ఇస్తున్నాడు\n\nసూచన: Paytm Business App నుండి పాత కస్టమర్ల కోసం <b>'Loyalty Cashback'</b> ఆఫర్ నడపండి — డిస్కౌంట్ కంటే నమ్మకంతో వారిని నిలుపుకోవచ్చు.",
+    kn: "ಒಂದು ಉತ್ತಮ ಬೆಳವಣಿಗೆ ಹೆಜ್ಜೆ:\n\n• ನಿಮ್ಮ 68% ವಹಿವಾಟುಗಳು Paytm QR ಮೂಲಕ ನಡೆಯುತ್ತಿವೆ — ತುಂಬಾ ಚೆನ್ನಾಗಿದೆ\n• ಹತ್ತಿರದಲ್ಲಿ ಒಂದು ಹೊಸ ಸ್ಪರ್ಧಿ ರಿಯಾಯಿತಿ ನೀಡುತ್ತಿದ್ದಾರೆ\n\nಸಲಹೆ: Paytm Business App ನಿಂದ ಹಳೆಯ ಗ್ರಾಹಕರಿಗೆ <b>'Loyalty Cashback'</b> ಆಫರ್ ನಡೆಸಿ — ರಿಯಾಯಿತಿಗಿಂತ ನಂಬಿಕೆಯಿಂದ ಅವರನ್ನು ಉಳಿಸಿಕೊಳ್ಳಬಹುದು.",
+    ml: "ഒരു നല്ല ഗ്രോത്ത് സ്റ്റെപ്പ്:\n\n• നിങ്ങളുടെ 68% ഇടപാടുകൾ Paytm QR വഴിയാണ് — വളരെ നല്ലത്\n• അടുത്ത് ഒരു പുതിയ എതിരാളി ഡിസ്കൗണ്ട് നൽകുന്നു\n\nനിർദ്ദേശം: Paytm Business App-ൽ നിന്ന് പഴയ ഉപഭോക്താക്കൾക്കായി <b>'Loyalty Cashback'</b> ഓഫർ നടത്തൂ — ഡിസ്കൗണ്ടിനേക്കാൾ വിശ്വാസത്തിലൂടെ അവരെ നിലനിർത്താം.",
+    pa: "ਇੱਕ ਵਧੀਆ ਗ੍ਰੋਥ ਕਦਮ:\n\n• ਤੁਹਾਡੇ 68% ਲੈਣ-ਦੇਣ Paytm QR ਰਾਹੀਂ ਹੋ ਰਹੇ ਹਨ — ਬਹੁਤ ਵਧੀਆ\n• ਨੇੜੇ ਇੱਕ ਨਵਾਂ ਮੁਕਾਬਲੇਬਾਜ਼ ਛੂਟ ਦੇ ਰਿਹਾ ਹੈ\n\nਸੁਝਾਅ: Paytm Business App ਤੋਂ ਪੁਰਾਣੇ ਗਾਹਕਾਂ ਲਈ <b>'Loyalty Cashback'</b> ਆਫ਼ਰ ਚਲਾਓ — ਛੂਟ ਨਾਲੋਂ ਭਰੋਸੇ ਨਾਲ ਉਹਨਾਂ ਨੂੰ ਰੋਕਿਆ ਜਾ ਸਕਦਾ ਹੈ।",
+    or: "ଏକ ଭଲ ଗ୍ରୋଥ ପଦକ୍ଷେପ:\n\n• ଆପଣଙ୍କ 68% ଲେନଦେନ Paytm QR ମାଧ୍ୟମରେ ହେଉଛି — ବହୁତ ଭଲ\n• ପାଖରେ ଏକ ନୂଆ ପ୍ରତିଦ୍ୱନ୍ଦ୍ୱୀ ଡିସ୍କାଉଣ୍ଟ ଦେଉଛନ୍ତି\n\nପରାମର୍ଶ: Paytm Business App ରୁ ପୁରୁଣା ଗ୍ରାହକଙ୍କ ପାଇଁ <b>'Loyalty Cashback'</b> ଅଫର୍ ଚଳାନ୍ତୁ — ଡିସ୍କାଉଣ୍ଟ ଅପେକ୍ଷା ବିଶ୍ୱାସରେ ସେମାନଙ୍କୁ ରଖାଯାଇପାରିବ।",
+    en: "A good growth step:\n\n• 68% of your transactions already happen via Paytm QR — that's great\n• A new competitor nearby is offering discounts\n\nSuggestion: Run a <b>'Loyalty Cashback'</b> offer via the Paytm Business App for your old customers — trust can retain them better than a discount war."
+  },
+  rating: {
+    hi: "Aapki rating <b>3.9/5</b> hai. Do common complaints hain:\n\n• Change (chutta paisa) na hona\n• Delivery thodi late hona\n\nSuggestion: Paytm QR ko counter ke sabse aage rakhein taaki customers cash ki jagah QR se pay karein — 'change nahi hai' wali problem hi khatam ho jayegi.",
+    mr: "तुमचे रेटिंग <b>3.9/5</b> आहे. दोन सामान्य तक्रारी:\n\n• सुट्टे पैसे नसणे\n• डिलिव्हरी थोडी उशिरा होणे\n\nसूचना: Paytm QR काउंटरच्या सर्वात पुढे ठेवा जेणेकरून ग्राहक रोख ऐवजी QR ने पेमेंट करतील — 'सुट्टे नाहीत' ही समस्याच संपेल.",
+    bn: "আপনার রেটিং <b>3.9/5</b>। দুটি সাধারণ অভিযোগ:\n\n• ভাংতি না থাকা\n• ডেলিভারি একটু দেরিতে হওয়া\n\nপরামর্শ: Paytm QR কাউন্টারের সবচেয়ে সামনে রাখুন যাতে গ্রাহকরা নগদের বদলে QR দিয়ে পে করেন — 'ভাংতি নেই' সমস্যা শেষ হয়ে যাবে।",
+    gu: "તમારું રેટિંગ <b>3.9/5</b> છે. બે સામાન્ય ફરિયાદો:\n\n• છૂટા પૈસા ન હોવા\n• ડિલિવરી થોડી મોડી થવી\n\nસૂચન: Paytm QR ને કાઉન્ટરની સૌથી આગળ રાખો જેથી ગ્રાહકો રોકડને બદલે QR થી પે કરે — 'છૂટા નથી' સમસ્યા જ ખતમ થઈ જશે.",
+    ta: "உங்கள் மதிப்பீடு <b>3.9/5</b>. இரண்டு பொதுவான புகார்கள்:\n\n• சில்லறை இல்லாதது\n• டெலிவரி சற்று தாமதம்\n\nபரிந்துரை: Paytm QR ஐ கவுண்டரின் முன்னால் வையுங்கள், இதனால் வாடிக்கையாளர்கள் பணத்திற்கு பதிலாக QR மூலம் பணம் செலுத்துவார்கள் — 'சில்லறை இல்லை' பிரச்சனை முடிந்துவிடும்.",
+    te: "మీ రేటింగ్ <b>3.9/5</b>. రెండు సాధారణ ఫిర్యాదులు:\n\n• చిల్లర లేకపోవడం\n• డెలివరీ కొంచెం ఆలస్యం కావడం\n\nసూచన: Paytm QR ని కౌంటర్ ముందు ఉంచండి, తద్వారా కస్టమర్లు నగదుకు బదులు QR ద్వారా చెల్లిస్తారు — 'చిల్లర లేదు' సమస్య తీరిపోతుంది.",
+    kn: "ನಿಮ್ಮ ರೇಟಿಂಗ್ <b>3.9/5</b>. ಎರಡು ಸಾಮಾನ್ಯ ದೂರುಗಳು:\n\n• ಚಿಲ್ಲರೆ ಇಲ್ಲದಿರುವುದು\n• ಡೆಲಿವರಿ ಸ್ವಲ್ಪ ತಡವಾಗುವುದು\n\nಸಲಹೆ: Paytm QR ಅನ್ನು ಕೌಂಟರ್‌ನ ಮುಂದೆ ಇಡಿ, ಇದರಿಂದ ಗ್ರಾಹಕರು ನಗದಿಗೆ ಬದಲು QR ಮೂಲಕ ಪಾವತಿಸುತ್ತಾರೆ — 'ಚಿಲ್ಲರೆ ಇಲ್ಲ' ಸಮಸ್ಯೆ ಮುಗಿದುಹೋಗುತ್ತದೆ.",
+    ml: "നിങ്ങളുടെ റേറ്റിംഗ് <b>3.9/5</b>. രണ്ട് സാധാരണ പരാതികൾ:\n\n• ചില്ലറ ഇല്ലാത്തത്\n• ഡെലിവറി അല്പം വൈകുന്നത്\n\nനിർദ്ദേശം: Paytm QR കൗണ്ടറിന്റെ ഏറ്റവും മുന്നിൽ വയ്ക്കൂ, അപ്പോൾ ഉപഭോക്താക്കൾ പണത്തിന് പകരം QR വഴി പണമടയ്ക്കും — 'ചില്ലറ ഇല്ല' പ്രശ്നം തീരും.",
+    pa: "ਤੁਹਾਡੀ ਰੇਟਿੰਗ <b>3.9/5</b> ਹੈ। ਦੋ ਆਮ ਸ਼ਿਕਾਇਤਾਂ:\n\n• ਖੁੱਲ੍ਹੇ ਪੈਸੇ ਨਾ ਹੋਣਾ\n• ਡਿਲਿਵਰੀ ਥੋੜ੍ਹੀ ਦੇਰ ਨਾਲ ਹੋਣਾ\n\nਸੁਝਾਅ: Paytm QR ਨੂੰ ਕਾਊਂਟਰ ਦੇ ਸਭ ਤੋਂ ਅੱਗੇ ਰੱਖੋ ਤਾਂ ਜੋ ਗਾਹਕ ਨਕਦ ਦੀ ਬਜਾਏ QR ਨਾਲ ਭੁਗਤਾਨ ਕਰਨ — 'ਖੁੱਲ੍ਹੇ ਨਹੀਂ' ਸਮੱਸਿਆ ਖ਼ਤਮ ਹੋ ਜਾਵੇਗੀ।",
+    or: "ଆପଣଙ୍କ ରେଟିଂ <b>3.9/5</b>। ଦୁଇଟି ସାଧାରଣ ଅଭିଯୋଗ:\n\n• ଖୁଚୁରା ପଇସା ନଥିବା\n• ଡେଲିଭରି ଟିକିଏ ବିଳମ୍ବ ହେବା\n\nପରାମର୍ଶ: Paytm QR କୁ କାଉଣ୍ଟରର ସବୁଠାରୁ ଆଗରେ ରଖନ୍ତୁ ଯାହାଫଳରେ ଗ୍ରାହକ ନଗଦ ବଦଳରେ QR ରେ ପେମେଣ୍ଟ କରନ୍ତି — 'ଖୁଚୁରା ନାହିଁ' ସମସ୍ୟା ସମାପ୍ତ ହୋଇଯିବ।",
+    en: "Your rating is <b>3.9/5</b>. Two common complaints:\n\n• Not having change (loose cash)\n• Delivery being a bit late\n\nSuggestion: Keep the Paytm QR right at the front of the counter so customers pay via QR instead of cash — this removes the 'no change' problem entirely."
+  },
+  fraud: {
+    hi: "<b>Fraud Shield check:</b> Maine aapka Paytm settlement ledger abhi cross-check kiya — pichle 11 minute mein is QR pe koi naya payment nahi aaya, sirf ₹120 ka purana confirmed transaction hai.\n\nIska matlab customer ka screenshot <b>fake ho sakta hai</b> — asli Paytm payment aane par Soundbox turant bolta hai.\n\nSuggestion: Jab tak Soundbox 'Payment Received' na bole, saamaan mat dein — sirf screenshot pe bharosa na karein.",
+    mr: "<b>फसवणूक तपासणी:</b> मी तुमचे Paytm सेटलमेंट लेजर आत्ताच तपासले — गेल्या 11 मिनिटांत या QR वर कोणतेही नवीन पेमेंट आलेले नाही, फक्त ₹120 चा जुना कन्फर्म व्यवहार आहे.\n\nयाचा अर्थ ग्राहकाचा स्क्रीनशॉट <b>बनावट असू शकतो</b> — खरे Paytm पेमेंट आल्यावर Soundbox लगेच सांगतो.\n\nसूचना: Soundbox 'Payment Received' बोलेपर्यंत सामान देऊ नका — फक्त स्क्रीनशॉटवर विश्वास ठेवू नका.",
+    bn: "<b>Fraud Shield চেক:</b> আমি এইমাত্র আপনার Paytm সেটেলমেন্ট লেজার চেক করলাম — গত 11 মিনিটে এই QR-এ কোনো নতুন পেমেন্ট আসেনি, শুধু ₹120-এর পুরনো নিশ্চিত লেনদেন আছে।\n\nএর মানে গ্রাহকের স্ক্রিনশট <b>ভুয়া হতে পারে</b> — আসল Paytm পেমেন্ট এলে Soundbox সাথে সাথে বলে দেয়।\n\nপরামর্শ: Soundbox 'Payment Received' না বলা পর্যন্ত জিনিস দেবেন না — শুধু স্ক্রিনশটের উপর বিশ্বাস করবেন না।",
+    gu: "<b>Fraud Shield ચેક:</b> મેં હમણાં તમારું Paytm સેટલમેન્ટ લેજર ચેક કર્યું — છેલ્લા 11 મિનિટમાં આ QR પર કોઈ નવું પેમેન્ટ આવ્યું નથી, ફક્ત ₹120નું જૂનું કન્ફર્મ ટ્રાન્ઝેક્શન છે.\n\nએનો અર્થ ગ્રાહકનો સ્ક્રીનશોટ <b>નકલી હોઈ શકે</b> — સાચું Paytm પેમેન્ટ આવે ત્યારે Soundbox તરત બોલે છે.\n\nસૂચન: Soundbox 'Payment Received' ન બોલે ત્યાં સુધી સામાન ન આપો — ફક્ત સ્ક્રીનશોટ પર ભરોસો ન કરો.",
+    ta: "<b>Fraud Shield சரிபார்ப்பு:</b> நான் இப்போது உங்கள் Paytm செட்டில்மென்ட் லெட்ஜரை பரிசோதித்தேன் — கடந்த 11 நிமிடங்களில் இந்த QR-ல் புதிய பணம் வரவில்லை, ₹120 பழைய உறுதிசெய்யப்பட்ட பரிவர்த்தனை மட்டும் உள்ளது.\n\nஇதன் அர்த்தம் வாடிக்கையாளரின் ஸ்கிரீன்ஷாட் <b>போலியாக இருக்கலாம்</b> — உண்மையான Paytm பணம் வந்தால் Soundbox உடனே சொல்லும்.\n\nபரிந்துரை: Soundbox 'Payment Received' என்று சொல்லும் வரை பொருட்களை கொடுக்காதீர்கள் — ஸ்கிரீன்ஷாட்டை மட்டும் நம்பாதீர்கள்.",
+    te: "<b>Fraud Shield చెక్:</b> నేను ఇప్పుడే మీ Paytm సెటిల్‌మెంట్ లెడ్జర్‌ని క్రాస్-చెక్ చేశాను — గత 11 నిమిషాల్లో ఈ QR పై కొత్త పేమెంట్ ఏదీ రాలేదు, కేవలం ₹120 పాత నిర్ధారిత లావాదేవీ మాత్రమే ఉంది.\n\nదీని అర్థం కస్టమర్ స్క్రీన్‌షాట్ <b>నకిలీది కావచ్చు</b> — నిజమైన Paytm పేమెంట్ వస్తే Soundbox వెంటనే చెబుతుంది.\n\nసూచన: Soundbox 'Payment Received' అని చెప్పే వరకు సామాను ఇవ్వకండి — స్క్రీన్‌షాట్‌ని మాత్రమే నమ్మకండి.",
+    kn: "<b>Fraud Shield ಪರಿಶೀಲನೆ:</b> ನಾನು ಈಗಷ್ಟೇ ನಿಮ್ಮ Paytm ಸೆಟಲ್‌ಮೆಂಟ್ ಲೆಡ್ಜರ್ ಅನ್ನು ಪರಿಶೀಲಿಸಿದೆ — ಕಳೆದ 11 ನಿಮಿಷಗಳಲ್ಲಿ ಈ QR ಮೇಲೆ ಯಾವುದೇ ಹೊಸ ಪಾವತಿ ಬಂದಿಲ್ಲ, ಕೇವಲ ₹120 ಹಳೆಯ ದೃಢಪಡಿಸಿದ ವಹಿವಾಟು ಮಾತ್ರ ಇದೆ.\n\nಇದರ ಅರ್ಥ ಗ್ರಾಹಕರ ಸ್ಕ್ರೀನ್‌ಶಾಟ್ <b>ನಕಲಿಯಾಗಿರಬಹುದು</b> — ನಿಜವಾದ Paytm ಪಾವತಿ ಬಂದಾಗ Soundbox ತಕ್ಷಣ ಹೇಳುತ್ತದೆ.\n\nಸಲಹೆ: Soundbox 'Payment Received' ಎಂದು ಹೇಳುವವರೆಗೆ ಸಾಮಾನು ಕೊಡಬೇಡಿ — ಸ್ಕ್ರೀನ್‌ಶಾಟ್ ಮಾತ್ರ ನಂಬಬೇಡಿ.",
+    ml: "<b>Fraud Shield പരിശോധന:</b> ഞാൻ ഇപ്പോൾ നിങ്ങളുടെ Paytm സെറ്റിൽമെന്റ് ലെഡ്ജർ ക്രോസ്-ചെക്ക് ചെയ്തു — കഴിഞ്ഞ 11 മിനിറ്റിനുള്ളിൽ ഈ QR-ൽ പുതിയ പേയ്‌മെന്റ് ഒന്നും വന്നിട്ടില്ല, ₹120-ന്റെ പഴയ സ്ഥിരീകരിച്ച ഇടപാട് മാത്രമേ ഉള്ളൂ.\n\nഇതിനർത്ഥം ഉപഭോക്താവിന്റെ സ്ക്രീൻഷോട്ട് <b>വ്യാജമായിരിക്കാം</b> — യഥാർത്ഥ Paytm പേയ്‌മെന്റ് വന്നാൽ Soundbox ഉടനെ പറയും.\n\nനിർദ്ദേശം: Soundbox 'Payment Received' എന്ന് പറയുന്നത് വരെ സാധനങ്ങൾ കൊടുക്കരുത് — സ്ക്രീൻഷോട്ട് മാത്രം വിശ്വസിക്കരുത്.",
+    pa: "<b>Fraud Shield ਜਾਂਚ:</b> ਮੈਂ ਹੁਣੇ ਤੁਹਾਡਾ Paytm ਸੈਟਲਮੈਂਟ ਲੈਜਰ ਚੈੱਕ ਕੀਤਾ — ਪਿਛਲੇ 11 ਮਿੰਟਾਂ ਵਿੱਚ ਇਸ QR 'ਤੇ ਕੋਈ ਨਵਾਂ ਭੁਗਤਾਨ ਨਹੀਂ ਆਇਆ, ਸਿਰਫ਼ ₹120 ਦਾ ਪੁਰਾਣਾ ਪੁਸ਼ਟੀ ਕੀਤਾ ਲੈਣ-ਦੇਣ ਹੈ।\n\nਇਸਦਾ ਮਤਲਬ ਗਾਹਕ ਦਾ ਸਕ੍ਰੀਨਸ਼ਾਟ <b>ਨਕਲੀ ਹੋ ਸਕਦਾ ਹੈ</b> — ਅਸਲੀ Paytm ਭੁਗਤਾਨ ਆਉਣ 'ਤੇ Soundbox ਤੁਰੰਤ ਬੋਲਦਾ ਹੈ।\n\nਸੁਝਾਅ: ਜਦੋਂ ਤੱਕ Soundbox 'Payment Received' ਨਾ ਬੋਲੇ, ਸਮਾਨ ਨਾ ਦਿਓ — ਸਿਰਫ਼ ਸਕ੍ਰੀਨਸ਼ਾਟ 'ਤੇ ਭਰੋਸਾ ਨਾ ਕਰੋ।",
+    or: "<b>Fraud Shield ଯାଞ୍ଚ:</b> ମୁଁ ବର୍ତ୍ତମାନ ଆପଣଙ୍କ Paytm ସେଟଲମେଣ୍ଟ ଲେଜର୍ କ୍ରସ୍-ଚେକ୍ କଲି — ଗତ 11 ମିନିଟରେ ଏହି QR ରେ କୌଣସି ନୂଆ ପେମେଣ୍ଟ ଆସିନାହିଁ, କେବଳ ₹120 ର ପୁରୁଣା ନିଶ୍ଚିତ ଲେନଦେନ ଅଛି।\n\nଏହାର ଅର୍ଥ ଗ୍ରାହକଙ୍କ ସ୍କ୍ରିନସଟ୍ <b>ନକଲି ହୋଇପାରେ</b> — ଆସଲ Paytm ପେମେଣ୍ଟ ଆସିଲେ Soundbox ତୁରନ୍ତ କୁହେ।\n\nପରାମର୍ଶ: Soundbox 'Payment Received' ନକହିବା ପର୍ଯ୍ୟନ୍ତ ସାମଗ୍ରୀ ଦିଅନ୍ତୁ ନାହିଁ — କେବଳ ସ୍କ୍ରିନସଟ୍ ଉପରେ ଭରସା କରନ୍ତୁ ନାହିଁ।",
+    en: "<b>Fraud Shield check:</b> I just cross-checked your Paytm settlement ledger — in the last 11 minutes, no new payment has come in on this QR, only an older confirmed transaction of ₹120.\n\nThis means the customer's screenshot could be <b>fake</b> — a real Paytm payment makes the Soundbox announce it instantly.\n\nSuggestion: Don't hand over goods until the Soundbox says 'Payment Received' — never trust a screenshot alone."
+  },
+  fallback: {
+    hi: "Achha sawaal hai. Abhi live Sarvam AI se jawab ke liye upar API key daalein. Waise general tip: apne top-selling product ka combo bana ke usse Paytm QR offers ke saath jodna sabse tez growth deta hai.",
+    mr: "चांगला प्रश्न आहे. लाईव्ह Sarvam AI उत्तरासाठी वर API key टाका. सर्वसाधारण टीप: तुमच्या सर्वाधिक विकल्या जाणाऱ्या उत्पादनाचा कॉम्बो Paytm QR ऑफर्ससोबत जोडणे सर्वात जलद ग्रोथ देते.",
+    bn: "ভালো প্রশ্ন। লাইভ Sarvam AI উত্তরের জন্য উপরে API key দিন। সাধারণ টিপ: আপনার সবচেয়ে বেশি বিক্রি হওয়া পণ্যের combo বানিয়ে Paytm QR অফারের সাথে জোড়া দিলে সবচেয়ে দ্রুত গ্রোথ পাওয়া যায়।",
+    gu: "સારો સવાલ છે. લાઈવ Sarvam AI જવાબ માટે ઉપર API key નાખો. સામાન્ય ટિપ: તમારા સૌથી વધુ વેચાતા પ્રોડક્ટનો કોમ્બો બનાવી Paytm QR ઑફર્સ સાથે જોડવાથી સૌથી ઝડપી ગ્રોથ મળે છે.",
+    ta: "நல்ல கேள்வி. நேரடி Sarvam AI பதிலுக்கு மேலே API key போடுங்கள். பொது டிப்: உங்கள் அதிக விற்பனையாகும் பொருளின் காம்போவை Paytm QR ஆபர்களுடன் இணைப்பது வேகமான வளர்ச்சியை தரும்.",
+    te: "మంచి ప్రశ్న. లైవ్ Sarvam AI సమాధానానికి పైన API key పెట్టండి. సాధారణ చిట్కా: మీ అత్యధికంగా అమ్ముడయ్యే ఉత్పత్తి కాంబోను Paytm QR ఆఫర్లతో జోడించడం వేగవంతమైన వృద్ధిని ఇస్తుంది.",
+    kn: "ಒಳ್ಳೆಯ ಪ್ರಶ್ನೆ. ಲೈವ್ Sarvam AI ಉತ್ತರಕ್ಕಾಗಿ ಮೇಲೆ API key ಹಾಕಿ. ಸಾಮಾನ್ಯ ಟಿಪ್: ನಿಮ್ಮ ಅತಿ ಹೆಚ್ಚು ಮಾರಾಟವಾಗುವ ಉತ್ಪನ್ನದ ಕಾಂಬೋವನ್ನು Paytm QR ಆಫರ್‌ಗಳೊಂದಿಗೆ ಜೋಡಿಸುವುದು ಅತಿ ವೇಗದ ಬೆಳವಣಿಗೆ ನೀಡುತ್ತದೆ.",
+    ml: "നല്ല ചോദ്യം. തത്സമയ Sarvam AI ഉത്തരത്തിന് മുകളിൽ API key ഇടൂ. പൊതു ടിപ്പ്: നിങ്ങളുടെ ഏറ്റവും കൂടുതൽ വിൽക്കുന്ന ഉൽപ്പന്നത്തിന്റെ കോംബോ Paytm QR ഓഫറുകളുമായി ചേർക്കുന്നത് ഏറ്റവും വേഗത്തിലുള്ള വളർച്ച നൽകും.",
+    pa: "ਚੰਗਾ ਸਵਾਲ ਹੈ। ਲਾਈਵ Sarvam AI ਜਵਾਬ ਲਈ ਉੱਪਰ API key ਪਾਓ। ਆਮ ਟਿਪ: ਤੁਹਾਡੇ ਸਭ ਤੋਂ ਵੱਧ ਵਿਕਣ ਵਾਲੇ ਪ੍ਰੋਡਕਟ ਦਾ ਕੰਬੋ ਬਣਾ ਕੇ Paytm QR ਆਫ਼ਰਾਂ ਨਾਲ ਜੋੜਨਾ ਸਭ ਤੋਂ ਤੇਜ਼ ਗ੍ਰੋਥ ਦਿੰਦਾ ਹੈ।",
+    or: "ଭଲ ପ୍ରଶ୍ନ। ଲାଇଭ୍ Sarvam AI ଉତ୍ତର ପାଇଁ ଉପରେ API key ଦିଅନ୍ତୁ। ସାଧାରଣ ଟିପ୍: ଆପଣଙ୍କ ସର୍ବାଧିକ ବିକ୍ରି ହେଉଥିବା ଉତ୍ପାଦର କମ୍ବୋ ତିଆରି କରି Paytm QR ଅଫର୍ ସହିତ ଯୋଡ଼ିବା ସବୁଠାରୁ ଦ୍ରୁତ ଗ୍ରୋଥ ଦିଏ।",
+    en: "Good question. Add your API key above for a live Sarvam AI answer. A general tip meanwhile: bundling your top-selling product with Paytm QR offers gives the fastest growth."
+  }
+};
+
+// Intent detection across scripts/languages for free-typed or spoken input
+const INTENT_PATTERNS = [
+  { key:'sales', re:/sales|bikri|विक्री|বিক্রি|વેચાણ|விற்பனை|అమ్మకాలు|ಮಾರಾಟ|വിൽപ്പന|ਸੇਲ|ବିକ୍ରୟ/i },
+  { key:'product', re:/product|best.?seller|bikne|प्रॉडक्ट|पण्य|প্রোডাক্ট|પ્રોડક્ટ|பொருள்|ఉత్పత్తి|ಉತ್ಪನ್ನ|ഉൽപ്പന്ന|ਪ੍ਰੋਡਕਟ|ଉତ୍ପାଦ/i },
+  { key:'growth', re:/grow|badhau|suggestion|tip|ग्रोथ|वाढ|প্রবৃদ্ধি|વૃદ્ધિ|வளர்ச்சி|వృద్ధి|ಬೆಳವಣಿಗೆ|വളർച്ച|ਵਾਧਾ|ବୃଦ୍ଧି/i },
+  { key:'rating', re:/rating|complaint|shikayat|रेटिंग|शिकायत|तक्रार|রেটিং|ફરિયાદ|மதிப்பீடு|రేటింగ్|ರೇಟಿಂಗ್|റേറ്റിംഗ്|ਰੇਟਿੰਗ|ରେଟିଂ/i },
+  { key:'fraud', re:/screenshot|fraud|scam|paisa aaya|fake|verify|फ्रॉड|स्क्रीनशॉट|স্ক্রিনশট|સ્ક્રીનશોટ|ஸ்கிரீன்ஷாட்|స్క్రీన్‌షాట్|ಸ್ಕ್ರೀನ್‌ಶಾಟ್|സ്ക്രീൻഷോട്ട്|ਸਕ੍ਰੀਨਸ਼ਾਟ|ସ୍କ୍ରିନସଟ୍/i }
+];
+function mockReply(q){
+  const hit = INTENT_PATTERNS.find(p => p.re.test(q));
+  const key = hit ? hit.key : 'fallback';
+  return REPLIES[key][currentLang] || REPLIES[key].en;
+}
+
+// ---- Mock merchant business data (context for the AI, sent on every live Sarvam AI call) ----
+function getSystemPrompt(){
+  return `
+Tum "Vyapari Mitra" ho — ek friendly AI business copilot jo Paytm ke chhote/madhyam merchants (jaise kirana store, mobile recharge shop) ki madad karta hai.
+Merchant ka data:
+- Naam: Sharma Kirana Store, Lucknow
+- Is hafte ki sales: Rs 1,82,000 (pichle hafte se 14% zyada)
+- Top products: Aata-Chawal combo, Recharge/Bill payments, Snacks & Namkeen
+- Customer rating: 3.9/5 (complaints: change na hona, delivery late)
+- Paytm QR se 68% transactions, cash se 32%
+- Competitor: Ek naya kirana store 500m door khula hai jo discount de raha hai
+- Paytm Soundbox live hai is QR pe; aakhri real confirmed payment 11 minute pehle ₹120 ka tha
+
+Tumhare paas ek khaas capability bhi hai — Fraud Shield: jab merchant poochhe ki customer ka payment screenshot sahi hai ya nahi, ya QR se paisa aaya ya nahi, tum Paytm ke settlement ledger (mock) se real-time cross-check karke seedha bata dete ho ki payment genuine hai ya fake/QR-swap scam, aur Soundbox confirmation pe bharosa karne ki salah dete ho.
+
+Tumhara kaam: Merchant ke sawaal ka jawab do jo:
+1. IMPORTANT: Reply ONLY in ${LANGS[currentLang].native} (${currentLang}) language — regardless of what script/language the user typed in.
+2. Data-based insight de
+3. Ek concrete, actionable suggestion de (jaise: "cashback offer chalao", "QR sticker counter pe lagao", "top product ka combo banao", ya fraud-check pe seedha verdict)
+4. Chota rakho — 3-5 lines, bullet points ok hain
+`;
+}
+
+function getKey(){ return localStorage.getItem('sarvam_key') || ''; }
+function saveKey(){
+  const k = document.getElementById('apiKey').value.trim();
+  if(k){ localStorage.setItem('sarvam_key', k); document.getElementById('setupBar').innerHTML = '<span>API key saved (this browser only)</span>'; }
+}
+window.onload = () => { if(getKey()) document.getElementById('setupBar').innerHTML = '<span>Sarvam AI key active</span>'; };
+
+function addMsg(text, who, speak){
+  const chat = document.getElementById('chat');
+  const div = document.createElement('div');
+  div.className = 'msg ' + who;
+  div.innerHTML = text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+  if(speak && who === 'bot') speakInLang(text);
+  return div;
+}
+
+// ---- Language switcher: updates UI text, greeting, chips, mic/TTS locale ----
+function setLang(lang){
+  currentLang = lang;
+  const L = LANGS[lang];
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+  document.querySelector('header p').textContent = L.subtitle;
+  document.getElementById('userInput').placeholder = L.placeholder;
+  document.getElementById('apiKey').placeholder = L.apiKeyPh;
+  document.getElementById('chat').innerHTML = `<div class="msg bot">${L.greet}</div>`;
+  const sugg = document.getElementById('suggestions');
+  sugg.innerHTML = CHIP_KEYS.map((key, i) => {
+    const label = CHIP_LABELS[lang][i];
+    const cls = key === 'fraud' ? 'chip chip-alert' : 'chip';
+    return `<div class="${cls}" onclick="askIntent('${key}')">${label}</div>`;
+  }).join('');
+}
+
+function askIntent(key){
+  const i = CHIP_KEYS.indexOf(key);
+  const label = CHIP_LABELS[currentLang][i];
+  document.getElementById('userInput').value = label;
+  sendMsg();
+}
+
+// ---- Voice input (speech-to-text, follows selected language) ----
+let recognizer = null, listening = false;
+function toggleMic(){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){ alert('Yeh browser voice input support nahi karta. Chrome try karein.'); return; }
+  const btn = document.getElementById('micBtn');
+  if(listening){ recognizer && recognizer.stop(); return; }
+  recognizer = new SR();
+  recognizer.lang = LANGS[currentLang].code;
+  recognizer.interimResults = false;
+  recognizer.maxAlternatives = 1;
+  recognizer.onstart = () => { listening = true; btn.classList.add('listening'); document.getElementById('micLabel').textContent = LANGS[currentLang].listening; };
+  recognizer.onresult = (e) => {
+    const transcript = e.results[0][0].transcript;
+    document.getElementById('userInput').value = transcript;
+    sendMsg();
+  };
+  recognizer.onerror = () => { addMsg(LANGS[currentLang].voiceErr, 'bot'); };
+  recognizer.onend = () => { listening = false; btn.classList.remove('listening'); };
+  recognizer.start();
+}
+
+// ---- Voice output (text-to-speech, follows selected language) ----
+function speakInLang(html){
+  if(!('speechSynthesis' in window)) return;
+  const plain = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  if(!plain) return;
+  window.speechSynthesis.cancel();
+  const code = LANGS[currentLang].code;
+  const utter = new SpeechSynthesisUtterance(plain);
+  utter.lang = code;
+  const voices = window.speechSynthesis.getVoices();
+  const voice = voices.find(v => v.lang === code) || voices.find(v => v.lang && v.lang.startsWith(code.split('-')[0]));
+  if(voice) utter.voice = voice;
+  utter.rate = 0.98;
+  window.speechSynthesis.speak(utter);
+}
+
+function ask(q){ document.getElementById('userInput').value = q; sendMsg(); }
+
+// ---- Tabs: Chat <-> Dashboard ----
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  document.getElementById('view-chat').classList.toggle('active', name === 'chat');
+  document.getElementById('view-dashboard').classList.toggle('active', name === 'dashboard');
+}
+
+// ---- Dashboard: sales trend bars (drawn from real weekly split, sums to ₹1,82,000) ----
+const SALES_WEEK = [22, 20, 21, 19, 24, 40, 36]; // in ₹'000, Mon..Sun
+function renderSalesBars(){
+  const wrap = document.getElementById('salesBars');
+  if(!wrap) return;
+  const max = Math.max(...SALES_WEEK);
+  wrap.innerHTML = SALES_WEEK.map(v =>
+    `<div class="bar" style="height:${Math.round((v / max) * 100)}%"><span>₹${v}k</span></div>`
+  ).join('');
+}
+renderSalesBars();
+setLang('hi');
+const requestedTab = new URLSearchParams(location.search).get('tab');
+if(requestedTab === 'dashboard') switchTab('dashboard');
+const requestedLang = new URLSearchParams(location.search).get('lang');
+if(requestedLang && LANGS[requestedLang]) setLang(requestedLang);
+
+// ---- Quick Actions: simulate an n8n-triggered workflow ----
+function showToast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => el.classList.remove('show'), 3200);
+}
+function runAction(msg){
+  showToast('✓ ' + msg + ' — n8n workflow se turant execute hua.');
+}
+
+// ---- Installable app (PWA) ----
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  document.getElementById('installBar').classList.add('show');
+});
+function installApp(){
+  if(!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  deferredInstallPrompt.userChoice.finally(() => {
+    deferredInstallPrompt = null;
+    document.getElementById('installBar').classList.remove('show');
+  });
+}
+if('serviceWorker' in navigator && (location.protocol === 'http:' || location.protocol === 'https:')){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js').catch(() => {});
+  });
+}
+
+// auto-demo mode for screenshots: ?demo=1 (sales) or ?demo=2 (fraud shield)
+const demoMode = new URLSearchParams(location.search).get('demo');
+if (demoMode === '1') {
+  setTimeout(() => ask('Is hafte ka sales kaisa raha, detail mein batao'), 250);
+} else if (demoMode === '2') {
+  setTimeout(() => ask('Customer ne payment ka screenshot dikhaya, paisa aaya kya check karo'), 250);
+}
+
+async function sendMsg(){
+  const input = document.getElementById('userInput');
+  const q = input.value.trim();
+  if(!q) return;
+  addMsg(q, 'user');
+  input.value = '';
+  const key = getKey();
+  const typingEl = addMsg('Vyapari Mitra soch raha hai...', 'bot');
+  typingEl.classList.add('typing');
+  if(!key){
+    setTimeout(() => { typingEl.remove(); addMsg(mockReply(q), 'bot', true); }, 500);
+    return;
+  }
+  try{
+    const res = await fetch('https://api.sarvam.ai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + key,
+        'api-subscription-key': key
+      },
+      body: JSON.stringify({
+        model: 'sarvam-105b',
+        temperature: 0.4,
+        max_tokens: 400,
+        messages: [
+          { role: 'system', content: getSystemPrompt() },
+          { role: 'user', content: q }
+        ]
+      })
+    });
+    const data = await res.json();
+    typingEl.remove();
+    if(data.choices && data.choices[0]){
+      addMsg(data.choices[0].message.content, 'bot', true);
+    } else {
+      addMsg('Error: ' + (data.error?.message || JSON.stringify(data).slice(0,200)), 'bot');
+    }
+  } catch(e){
+    typingEl.remove();
+    addMsg('Network/API error: ' + e.message, 'bot');
+  }
+}
+</script>
+</body>
+</html>
